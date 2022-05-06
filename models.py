@@ -55,7 +55,6 @@ class TodosSQLite:
         cur = conn.cursor()
         cur.execute(sql, data)
         conn.commit()
-        cur.close()
         return cur.lastrowid
 
 
