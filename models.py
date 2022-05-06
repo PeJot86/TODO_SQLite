@@ -24,8 +24,8 @@ class TodosSQLite:
             print("Todos table already exist")
         finally:
             conn.close()
-        
-    
+
+
     def show_all(self, conn, table):
             conn = self.create_connection()
             cur = conn.cursor()
@@ -46,18 +46,40 @@ class TodosSQLite:
             cur.execute(f"SELECT * FROM {table} WHERE {q}", values)
             rows = cur.fetchall()
             return rows
-        
     
-    def add_todos(self, conn, task):
-        sql = '''INSERT INTO todos(todos_id, title, description, status)
+    
+    def add_todos(self, conn, data):
+        sql = '''INSERT OR IGNORE INTO todos(todos_id, title, description, status)
                     VALUES(?,?,?,?)'''
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute(sql, task)
+        cur.execute(sql, data)
         conn.commit()
         cur.close()
         return cur.lastrowid
-        
 
+
+    def delete_all(self, conn, table):
+        conn = self.create_connection()
+        sql = f'DELETE FROM {table}'
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()
+        return print("Deleted")    
+
+
+    def delete_where(self, conn, table, **kwargs):
+            qs = []
+            values = tuple()
+            for k, v in kwargs.items():
+                qs.append(f"{k}=?")
+                values += (v,)
+            q = " AND ".join(qs)
+            conn = self.create_connection()
+            sql = f'DELETE FROM {table} WHERE {q}'
+            cur = conn.cursor()
+            cur.execute(sql, values)
+            conn.commit()
+            print("Deleted")
 
 todos = TodosSQLite()

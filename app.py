@@ -14,11 +14,10 @@ def todos_list():
     return str (todos.show_all(conn, "todos"))
 
 
-@app.route("/api/todos/id", methods=["GET"])
-def get_todo_id(): 
+@app.route("/api/todos/<int:id>", methods=["GET"])
+def get_todo_id(id): 
     conn = todos.create_connection()
-    return str (todos.show_where(conn, "todos", projekt_id = 5))
-
+    return str(todos.show_where(conn, "todos", todos_id = id ))
 
 # @app.errorhandler(404)
 # def not_found(error):
@@ -30,26 +29,31 @@ def create_todo():
     conn = todos.create_connection()
     task = (
         3,
-        "Nie zapominaj",
-        "Zapamiętaj!",
+        "Weź pigułkę",
+        "Nie zapomnij bo cię szlag trafi!",
         "started"
     )
     conn.commit()
-    return str (todos.add_todos(conn, task))
-
-
+    return str(todos.add_todos(conn, task))
 
 # @app.errorhandler(400)
 # def bad_request(error):
 #     return make_response(jsonify({'error': 'Bad request', 'status_code': 400}), 400)
 
 
-# @app.route("/api/v1/todos/<int:todo_id>", methods=['DELETE'])
-# def delete_todo(todo_id):
-#     result = todos.delete(todo_id)
-#     if not result:
-#         abort(404)
-#     return jsonify({'result': result})
+@app.route("/api/todos/del", methods=['DELETE'])
+def delete_todo():
+    conn = todos.create_connection()
+    return str (todos.delete_all(conn, "todos"))
+
+
+@app.route("/api/todos/del/<int:id>", methods=["DELETE"])
+def delete_todo_id(id): 
+    conn = todos.create_connection()
+    return str(todos.delete_where(conn, "todos", todos_id = id ))
+
+
+
 
 
 # @app.route("/api/v1/todos/<int:todo_id>", methods=["PUT"])
