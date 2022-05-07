@@ -13,7 +13,4 @@ DELETE http://localhost:5000/api/todos/del
 DELETE http://localhost:5000/api/todos/del/id
 
 
-PUT http://localhost:5000/api/todos/update
-
-
 PUT http://localhost:5000/api/todos/update/id

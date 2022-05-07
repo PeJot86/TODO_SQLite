@@ -4,10 +4,10 @@ class TodosSQLite:
         
     def __init__(self, db_file):
         self.db_file = db_file
-    
+
     
     def create_connection(self):
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(self.db_file)
         return conn
         
     
@@ -30,15 +30,15 @@ class TodosSQLite:
             conn.close()
 
 
-    def show_all(self, table):
+    def show_all(self):
         with self.create_connection() as conn:
             cur = conn.cursor()
-            cur.execute(f"SELECT * FROM {table}")
+            cur.execute(f"SELECT * FROM todos")
             rows = cur.fetchall()
             return rows
 
         
-    def show_where(self, table, **query):
+    def show_where(self, **query):
         with self.create_connection() as conn:
             cur = conn.cursor()
             qs = []
@@ -47,31 +47,32 @@ class TodosSQLite:
                 qs.append(f"{k}=?")
                 values += (v,)
             q = " AND ".join(qs)
-            cur.execute(f"SELECT * FROM {table} WHERE {q}", values)
+            cur.execute(f"SELECT * FROM todos WHERE {q}", values)
             rows = cur.fetchall()
             return rows
     
     
     def add_todos(self, data):
-        sql = '''INSERT OR IGNORE INTO todos(todos_id, title, description, status)
-                    VALUES(?,?,?,?)'''
+        sql = '''INSERT OR IGNORE INTO todos( title, description, status)
+                    VALUES(?,?,?)'''
         with self.create_connection() as conn:
             cur = conn.cursor()
             cur.execute(sql, (data))
             conn.commit()
+            print (data)
             return cur.lastrowid    
 
 
-    def delete_all(self, table):
+    def delete_all(self):
         with self.create_connection() as conn:
-            sql = f'DELETE FROM {table}'
+            sql = f'DELETE FROM todos'
             cur = conn.cursor()
             cur.execute(sql)
             conn.commit()
             return print("Deleted")    
 
 
-    def delete_where(self, table, **kwargs):
+    def delete_where(self, **kwargs):
             qs = []
             values = tuple()
             for k, v in kwargs.items():
@@ -79,21 +80,21 @@ class TodosSQLite:
                 values += (v,)
             q = " AND ".join(qs)
             with self.create_connection() as conn:
-                sql = f'DELETE FROM {table} WHERE {q}'
+                sql = f'DELETE FROM todos WHERE {q}'
                 cur = conn.cursor()
                 cur.execute(sql, values)
                 conn.commit()
                 print("Deleted")
 
     
-    def update_todo(self, table, todos_id, **kwargs):
+    def update_todo(self, todos_id, **kwargs):
         with self.create_connection() as conn:
             parameters = [f"{k} = ?" for k in kwargs]
             parameters = ", ".join(parameters)
             values = tuple(v for v in kwargs.values())
             values += (todos_id, )
 
-            sql = f''' UPDATE {table}
+            sql = f''' UPDATE todos
                         SET {parameters}
                         WHERE todos_id = ?'''
             try:

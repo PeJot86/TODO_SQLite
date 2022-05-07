@@ -1,5 +1,5 @@
 
-from flask import Flask, make_response, jsonify
+from flask import Flask, make_response, jsonify, Response
 from models import todos
 
 
@@ -10,12 +10,12 @@ todos.create_table()
 
 @app.route("/api/todos/", methods=["GET"])
 def todos_list():
-    return jsonify (todos.show_all("todos"))
+    return jsonify (todos.show_all())
 
 
 @app.route("/api/todos/<int:id>", methods=["GET"])
 def get_todo_id(id): 
-    return jsonify (todos.show_where("todos", todos_id = id ))
+    return jsonify (todos.show_where( todos_id = id ))
 
 
 @app.errorhandler(404)
@@ -26,12 +26,12 @@ def not_found(error):
 @app.route("/api/todos/add", methods=["POST"])
 def create_todo():
     task = (
-        1,
-        "Zabierz parasol",
-        "Będzie niezła ulewa",
+        "Skoś trawnik",
+        "Musisz skonczyć do 19",
         "started"
     )
-    return jsonify (todos.add_todos(task))
+    todos.add_todos(task)
+    return Response(status=201)
 
 
 @app.errorhandler(400)
@@ -41,17 +41,20 @@ def bad_request(error):
 
 @app.route("/api/todos/del", methods=["DELETE"])
 def delete_todo():
-    return jsonify (todos.delete_all("todos"))
+    todos.delete_all()
+    return Response(status=200)
 
 
 @app.route("/api/todos/del/<int:id>", methods=["DELETE"])
 def delete_todo_id(id): 
-    return jsonify (todos.delete_where("todos", todos_id = id ))
+    todos.delete_where(todos_id = id )
+    return Response(status=200)
 
 
 @app.route("/api/todos/update/<int:id>", methods=["PUT"])
 def update_todo_id(id): 
-    return jsonify (todos.update_todo("todos", todos_id = id, title ="Kup chleb"))
+    todos.update_todo( todos_id = id, title ="Kup chleb")
+    return Response(status=200)
    
 
 if __name__ == "__main__":
